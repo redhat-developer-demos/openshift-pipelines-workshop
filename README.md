@@ -82,6 +82,7 @@ For OpenShift Pipelines, we need to install the operator and create a subscripti
 
 ### Workshop Step 0: Log in
 Before any work can begin, you must be logged into your OpenShift cluster with cluster-admin permissions. You can verify this by running the following command:  
+
 `oc get permissions`
 
 
@@ -105,13 +106,31 @@ You have two choices: Use the web UI dashboard or use the command line.
 
 
 ### Workshop Step 3: Create subscription  
-`oc apply --filename https://storage.googleapis.com/tekton-releases/latest/release.yaml`  
+`oc apply -f sub.yaml`
+
 
 ### Workshop Step 4: Create pipeline  
-`oc apply -f echo-hello-world-task-run.yaml`  
+`oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/update_deployment_task.yaml`
+
 ### Workshop Step 5: Create tasks  
-`oc apply -f echo-hello-world-task.yaml`  
+
+`oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/apply_manifest_task.yaml`
+`tkn clustertask ls`
+`tkn task ls`
+
+`tkn resource create`
+**TODO** create steps here
+
+`tkn resource ls`
+
+### Step 5.5: Create pipeline
+
+`oc create -f https://raw.githubusercontent/openshift/pipelines-tutorial/master/pipeline/pipeline.yaml`
+`tkn pipeline ls`
+
 ### Workshop Step 6: Run pipeline  
+`tkn pipeline start build-and-deploy`
+
 ### Workshop Step 7: View results  
 ### Workshop Optional Step 8: Alter source code  
 ### Workshop Optional Step 9: View new results  
