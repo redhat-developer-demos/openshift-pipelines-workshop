@@ -58,7 +58,7 @@ The final section of this workshop will have you updating your existing code tha
 
 If you do not wish to include this section, you will be pulling code from an existing github repo.
 
-## *TODO* Workshop
+## Workshop
 The following list shows the seven steps will be used to get our CI/CD pipeline up and running:
 1. Create projects
 1. Install operator
@@ -96,16 +96,16 @@ You have two choices: Use the web UI dashboard or use the command line.
 
 #### Installing Pipelines operator using the Web UI dashboard
 
-*TODO* Screen shots and instructions here
+*TODO* (this, the Web UI instruction section, is a work in process)
 
 #### Installing the Pipelines operator using the command line.  
 
+### Set permissions
+
 `oc adm policy add-scc-to-user anyuid -z tekton-pipelines-controller`  
 
-
-
-
 ### Workshop Step 3: Create subscription  
+ 
 `oc apply -f sub.yaml`
 
 
@@ -119,6 +119,7 @@ You have two choices: Use the web UI dashboard or use the command line.
 `tkn task ls`
 
 `tkn resource create`
+
 **TODO** create steps here
 
 `tkn resource ls`
@@ -132,69 +133,5 @@ You have two choices: Use the web UI dashboard or use the command line.
 `tkn pipeline start build-and-deploy`
 
 ### Workshop Step 7: View results  
-### Workshop Optional Step 8: Alter source code  
-### Workshop Optional Step 9: View new results  
 
-## *TODO* Optional
-
-## *TODO* Conclusion
-
-
-
-We'll start by creating an OpenShift cluster. We have several options, but I'm going to use a public cloud provider in order to mimic a real development environment as closely as possible. In other words, I'm not running it locally on my PC where only I can use it. I want this to be realistic.  
-
-`./openshift create cluster`  
-
-Next, create a project where we'll run Tekton:
-
-`oc new-project tekton-pipelines --display-name='Tekton Pipelines'`  
-
-Install OpenShift Pipelines  
-
-
-
-*TODO* Make sure the tkn cli tool is installed.
-
-Tekton uses Kubernetes Custom Resources, which are defined using a YAML file. That definition, the Custom Resource Definition, is commonly referred to by the acronym "CRD". You'll see that a lot when working with Kubernetes. A lot.  
-
-Tekton needs CRDs for the following five parts:   
-
-Task  
-Pipeline  
-ResourcePipeline  
-TaskRun  
-PipelineRun  
-
-Tasks are the pieces of a PipelineResource. It runs in a pod. Examples are Build a web service, deploy the web service. A Task is a "kind" of CRD. It defines the work and may contain multiple steps. The steps are executed in a sequential manner, and cumulatively they make up the Task. Think of the following sequence:  
-Build the app,   
-test the app,   
-deploy the app.   
-
-These would be (three) separate tasks.  
-
-A Task has inputs and outputs. The input comes in the form of Parameters and PipelineResources. For example, the Task will need to know the path to the code to be used for compiling, or the location of a Dockerfile for building an image. In the latter case, the output would be a Linux image.How does it work? A pod is created for a task, the task is executed, and the results are delivered.
-
-Pipeline
-A list of tasks that defines the order of operation and links outputs and inputs. Multitasking is supported.  
-
-PipelineResource  
-Defines type of input, for example, the location of the git repo. Typically types are "git" and "image".  
-
-TaskRun  
-Instance of a Task and binds outputs and input, sets values of any parameters and executes the Task steps.  
-
-PipelineRun  
-Instance of a Pipeline, binds outputs and inputs, creates and executes TaskRun objects and collects the results.Example with two web services  
-
-Step 1. 
-Build  
-Pull source code  
-Build image  
-Push image  
-This is all defined by the Pipeline Resource, which accepts source code as the input and delivers a container image.  
-
-Step 2. Deployment  
-Another PipelineResource with two tasks: Update the deployment manifest and create the deployment. The input is the container image from step 1 and the output is a web service.  
-
-Pipeline  
-The above two steps, which are defined as PipelineResource classes, are combined to make up our Pipeline.
+Select the project in your Web UI, choose the Routes option from the menu on the left, and then click the route listed. Your default browser will open with the results.
