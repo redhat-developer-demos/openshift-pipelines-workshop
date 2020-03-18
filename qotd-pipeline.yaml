@@ -24,3 +24,13 @@ spec:
       params:
         - name: TLSVERIFY
           value: "false"
+
+    - name: apply-manifests
+      taskRef:
+        name: apply-manifests
+      resources:
+        inputs:
+          - name: source
+            resource: qotd-git
+      runAfter:
+        - golang-build
