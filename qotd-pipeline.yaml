@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: qotd-build-and-deploy
+spec:
+  resources:
+    - name: qotd-git
+      type: git
+    - name: qotd-image
+      type: image
+
+  tasks:
+    - name: golang-build
+      taskRef:
+        name: s2i-go
+        kind: ClusterTask
+      resources:
+        inputs:
+          - name: source
+            resource: qotd-git
+        outputs:
+          - name: image
+            resource: qotd-image
+      params:
+        - name: TLSVERIFY
+          value: "false"
