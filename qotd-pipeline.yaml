@@ -35,4 +35,16 @@ spec:
       runAfter:
         - golang-build
 
+    - name: update-qotd-image
+      taskRef:
+        name: update-deployment
+      resources:
+        inputs:
+          - name: image
+            resource: qotd-image
+      params:
+          - name: deployment
+            value: "qotd"
+      runAfter:
+          - apply-manifests
 
