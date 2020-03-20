@@ -3,11 +3,6 @@ kind: Pipeline
 metadata:
   name: qotd-build-and-deploy
 spec:
-  params:
-    - default: latest
-      description: Enter the image tag
-      name: imageTag
-      type: string
   resources:
     - name: qotd-git
       type: git
