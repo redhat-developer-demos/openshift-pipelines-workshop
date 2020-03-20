@@ -21,15 +21,16 @@ As an optional step, we will then progress to using the automated CI/CD system a
 
 The engine for this is OpenShift Pipelines. OpenShift Pipelines relies on Tekton, the container-based build component of Knative, and runs in pods. Because each step runs in it's own pod, the benefits include scaling and the ability to run steps in parallel.
 
-This example will feature code written in Java.
+This example will feature code written in Go.
 
 ## Prerequisites
 The following environments and/or tools are necessary to perform this workshop:
-1. Terminal on your PC
-2. OpenShift version 4.2 cluster
-3. Tekton command line interface (CLI), `tkn`
-4. OpenShift CLI, `oc`
-5. Optional Git repo
+1. A terminal session on your PC
+1. OpenShift version 4.2 cluster
+1. Tekton command line interface (CLI), `tkn`
+1. OpenShift CLI, `oc`
+1. Git
+1. Git repo at https://github.com/redhat-developer-demos/openshift-pipelines-tutorial.git. You'll need to clone this repo to your machine.
 
 ### Prerequisite #1: Terminal on your PC
 You'll need to be able to run commands at the command line on your PC. Note that this workshop works with Linux and macOS (bash) and Windows (PowerShell). Where any differences occur in this workshop, commands for both environments will be supplied.
@@ -53,18 +54,23 @@ The OpenShift CLI, `oc`, is necessary. Note that this utility is built for your 
 
 To install oc, visit [the OpenShift version 4 clients download page](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/) and download the client for your operating. You'll need to decompress the downloaded file and make sure the resulting executable bits are in your system PATH variable.
 
-### Prerequisite #5: Git repo
-The final section of this workshop will have you updating your existing code that is automatically built and deployed. In order to perform this optional section, you'll need a Git repo from which you will clone your code and into which you will push your code -- which will fire a webhook and start the automated CI/CD pipelines.
+### Prerequisite #5: Git
+You'll need the Git tool installed on your machine. You can find the instructions at www.git-scm.com.
 
-If you do not wish to include this section, you will be pulling code from an existing github repo.
+### Prerequisite #6: Git repo
+You will need the Git repo associated with this workshop.
+
+`git clone https://github.com/redhat-developer-demos/openshift-pipelines-tutorial.git`
+
+After cloning this repo, move into the directory where it is located. This will be the home directory for the remainder of this workshop.
 
 ## Workshop
 The following list shows the seven steps will be used to get our CI/CD pipeline up and running:
 1. Create projects
 1. Install operator
-1. Create subscription
 1. Create Pipeline
 1. Create Tasks
+1. Create Pipeline Resources
 1. Run the Pipeline
 1. View the results
 
@@ -74,64 +80,65 @@ The following list shows the seven steps will be used to get our CI/CD pipeline 
 
 Because OpenShift is built on Kubernetes, it supports the concept of "Operators", or pre-built Customer Resource Descriptions (CRD) that include the sometimes many pieces needed to invoke a solution. In other words, a Kubernetes Operator can be used to start a complex solution. For example, there is a Kubernetes Operator that allows you to very easily get an instance of MongoDB running in your OpenShift cluster. There are others: Eclipse Che, Elasticsearch, Kafka, and dozens more.
 
-To invoke an operator may involve many steps. You install the Operator and the create a Subscription. In some cases, such as Kafka, you then invoke the API you want. For example, Kafka Connect or Kafka Topic.
+To invoke an operator *may* involve many steps. You install the Operator and the create a Subscription. In some cases, such as Kafka, you then invoke the API you want. For example, Kafka Connect or Kafka Topic.
 
-For OpenShift Pipelines, we need to install the operator and create a subscription. After that we can start building the pieces that comprise our own, specific pipeline.
+For OpenShift Pipelines, one quick command will give us all we need.
 </div>
 <hr>
 
 ### Workshop Step 0: Log in
-Before any work can begin, you must be logged into your OpenShift cluster with cluster-admin permissions. You can verify this by running the following command:  
-
-`oc get permissions`
-
+Before any work can begin, you must be logged into your OpenShift cluster with cluster-admin. Use the `oc login` command to do this.
 
 ### Workshop Step 1: Create projects
+Create an OpenShift project in which we'll be working.  
 
 `oc new-project pipelines-tutorial`
 
-
 ### Workshop Step 2: Install operator
-You have two choices: Use the web UI dashboard or use the command line.  
-
-#### Installing Pipelines operator using the Web UI dashboard
-
-*TODO* (this, the Web UI instruction section, is a work in process)
+You have two choices: Use the web UI dashboard or use the command line. For this workshop, we'll be using the command line. 
 
 #### Installing the Pipelines operator using the command line.  
+This will install the Pipelines operator and make it available for use.  
 
-### Set permissions
-
-`oc adm policy add-scc-to-user anyuid -z tekton-pipelines-controller`  
-
-### Workshop Step 3: Create subscription  
- 
 `oc apply -f sub.yaml`
 
+### Workshop Step 3: Create pipeline  
+`oc create -f qotd-pipeline.yaml`
 
-### Workshop Step 4: Create pipeline  
-`oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/update_deployment_task.yaml`
-
-### Workshop Step 5: Create tasks  
+### Workshop Step 4: Create tasks  
 
 `oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/apply_manifest_task.yaml`
-`tkn clustertask ls`
-`tkn task ls`
 
-`tkn resource create`
 
-**TODO** create steps here
 
-`tkn resource ls`
+### Step 5: Create pipeline resources
+We need to create two resources:
+* qotd-git - defines the location of the github repo containing the source code to be compiled into an image
+* qotd-image - defines the location of the created image
 
-### Step 5.5: Create pipeline
+We'll need to run the command `tkn resource create` twice, once for each resource. Here are the values needed:
 
-`oc create -f https://raw.githubusercontent/openshift/pipelines-tutorial/master/pipeline/pipeline.yaml`
-`tkn pipeline ls`
+`tkn resource create`  
+Name: qotd-git  
+Type: git  
+Url: https://github.com/donschenck/qotd.git  
+Revision: (leave blank)  
+
+`tkn resource create`  
+Name: qotd-image  
+Type: image  
+Url: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/qotd:latest  
+Digest: (leave blank)  
+
+We can view the results by running `tkn resource ls`  
+
+![tkn resource ls results](images/tkn-resource-ls.png)
 
 ### Workshop Step 6: Run pipeline  
 `tkn pipeline start build-and-deploy`
 
 ### Workshop Step 7: View results  
 
-Select the project in your Web UI, choose the Routes option from the menu on the left, and then click the route listed. Your default browser will open with the results.
+`oc get routes`
+
+Use the route in your browser to navigate to the results. Refresh your browser several times to see random results.
