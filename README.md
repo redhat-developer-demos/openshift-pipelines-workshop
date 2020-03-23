@@ -116,15 +116,48 @@ Example:
 ![oc apply -f sub.yaml](images/oc-apply-sub.png)
 
 ### Workshop Step 3: Create pipeline  
+The next step is to create the pipeline we want to use. The following pipeline is discussed following this image:
+
+![pipeline.png](images/pipeline.png)
+
+#### Line 4: name
+
+This is the name assigned to the pipeline. This name *does not* need to match the name of the file used to create this pipeline. In fact, in this particular example, the file is named "qotd-pipeline.yaml" while the pipeline, *inside of your OpenShift cluster*, is named "qotd-build-and-deploy". It is probably a good idea to make the names match; this is a management issue.
+
+#### Lines 6 through 10: resource
+
+This pipeline uses two resources: A git repo as the input and a Linux container as the output. That is to say, it will clone a git repo and build an image.
+
+Note that the resource _names_ are *not* the same thing as the resource *values*. In our example, the git repo resource name is "gotd-git", but that has no value. Later, when we create this resource, we'll give it a value, i.e. a URL that points to the repo.
+
+#### Lines 13 through 36: tasks
+
+This section declares what is done and in what order.
+
+Line 13 is a name that we've assigned; it could just as well be called 'foo'. The "taskRef", in lines 14 through 16, is where we call out exactly what to do and where to find it. 
+
+The name "s2i-go" (line 15) is a built-in "ClusterTask" (line 16), a task that is built into the OpenShift Pipelines. You can see this and all the other ClusterTasks by running the command `tkn clustertask ls`. A ClusterTask is available across *all* namespaces in the OpenShift cluster, while tasks that we have created are limited to the namespace in which they are created.
+
+In line 30 we declare a task that we created (that happens later in this workshop). Notice line 36, which specifies that this task runs only after the task "golang-build" is completed.
+
+With that knowledge, let's create the pipeline:
+
+#### Command to create the pipeline  
+
 `oc create -f qotd-pipeline.yaml`
+
+Example:
+![oc apply -f qotd-pipeline.yaml](images/oc-apply-pipeline.png)  
+
 
 ### Workshop Step 4: Create tasks  
 
+Because we're using the "s2i-go" ClusterTask to build the Go program, the only task we need to create in our namespace is the "apply-manifests" task. As good fortune would have it, we don't even need to create this from scratch. It's a part of the OpenShift Pipelines catalog, a collection of open source, reusable tasks. The catalog can be found at https://github.com/openshift/pipelines-catalog.
+
 `oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/pipeline/apply_manifest_task.yaml`
 
+### Step 5: Create pipeline resources  
 
-
-### Step 5: Create pipeline resources
 We need to create two resources:
 * qotd-git - defines the location of the github repo containing the source code to be compiled into an image
 * qotd-image - defines the location of the created image
