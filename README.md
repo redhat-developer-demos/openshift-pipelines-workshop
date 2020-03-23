@@ -21,8 +21,9 @@ As an optional step, we will then move forward, using the automated CI/CD system
 
 The engine for this is OpenShift Pipelines. OpenShift Pipelines relies on Tekton, the container-based build component of Knative, and runs in pods. Because each step runs in it's own pod, the benefits include scaling and the ability to run steps in parallel.
 
-This example will feature code written in Go. A simple RESTful service, Quote Of The Day, will return a random quote via an HTTP Get request. For example:
+This example will feature code written in Go. A simple RESTful service, Quote Of The Day, will return a random quote via an HTTP Get request.
 
+Example:
 ![tkn resource ls results](images/curl-example.png)
 
 ## Prerequisites
@@ -84,24 +85,27 @@ The following list shows the seven steps that will be used to get our CI/CD pipe
  <div style="background-color: cornsilk; margin-left: 20px; margin-right: 20px">
 <h4>Operators and Subscriptions Explained</h4>  
 
-Because OpenShift is built on Kubernetes, it supports the concept of "Operators", or pre-built Customer Resource Descriptions (CRD) that include the sometimes many pieces needed to invoke a solution. In other words, a Kubernetes Operator can be used to start and maintain a complex solution. For example, there is a Kubernetes Operator that allows you to very easily get an instance of MongoDB running in your OpenShift cluster. There are others: Eclipse Che, Elasticsearch, Kafka, and dozens more.
+Because OpenShift is built on Kubernetes, it supports the concept of "Operators", or pre-built Customer Resource Descriptions (CRD) that include the sometimes many pieces needed to invoke a solution. In other words, a Kubernetes Operator can be used to start and maintain a complex solution. For example, there is a Kubernetes Operator that allows you to very easily get an instance of MongoDB running in your OpenShift cluster. There are others: Eclipse Che, Elasticsearch, Kafka, and dozens more.  
 
 To invoke an operator *may* involve many steps. You install the Operator and the create a Subscription. In some cases, such as Kafka, you then invoke the API you want. For example, Kafka Connect or Kafka Topic.
-
+  
 For OpenShift Pipelines, one quick command will give us all we need.
 </div>
 <hr>
 
 ### Workshop Step 0: Log in
-Before any work can begin, you must be logged into your OpenShift cluster with cluster-admin. Use the `oc login` command to do this.
+Before any work can begin, you must be logged into your OpenShift cluster with cluster-admin rights. Use the `oc login` command to do this.
 
 ### Workshop Step 1: Create projects
 Create an OpenShift project in which we'll be working.  
 
 `oc new-project pipelines-tutorial`
 
+Example:
+![tkn resource ls results](images/oc-new-project.png)
+
 ### Workshop Step 2: Install operator
-You have two choices: Use the web UI dashboard or use the command line. For this workshop, we'll be using the command line. 
+When it comes to installing the OpenShift Pipelines Operator, you have two choices: Use the web UI dashboard or use the command line. For this workshop, we'll be using the command line. 
 
 #### Installing the Pipelines operator using the command line.  
 This will install the Pipelines operator and make it available for use.  
