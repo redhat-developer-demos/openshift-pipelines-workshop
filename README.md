@@ -112,6 +112,9 @@ This will install the Pipelines operator and make it available for use.
 
 `oc apply -f sub.yaml`
 
+Example:
+![oc apply -f sub.yaml](images/oc-apply-sub.png)
+
 ### Workshop Step 3: Create pipeline  
 `oc create -f qotd-pipeline.yaml`
 
