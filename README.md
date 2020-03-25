@@ -181,10 +181,45 @@ We can view the results by running `tkn resource ls`
 ![tkn resource ls results](images/tkn-resource-ls.png)
 
 ### Workshop Step 6: Run pipeline  
-`tkn pipeline start build-and-deploy`
+At this point, we have a pipeline, tasks that make up the pipeline, and resources to be used by the build. We can see what we have by running some commands.
+
+`tkn task ls` to see a list of tasks:
+
+Example:
+![tkn task ls results](images/tkn-task-ls.png)
+
+`tkn pipleline ls` to see a list of pipelines:
+
+Example:
+![tkn pipeline ls results](images/tkn-pipeline-ls.png)
+
+Now what we have the name of the pipeline, we can start it. After it is started, the terminal will return the command you will use to watch the progress of the build.
+
+When you are prompted for the resources to use, use the default values.
+
+`tkn pipeline start qotd-build-and-deploy`
+
+Example:
+![tkn pipeline start](images/tkn-pipeline-start.png)
+
+![pipeline log](images/pipeline-log.png)
 
 ### Workshop Step 7: View results  
 
 `oc get routes`
 
-Use the route in your browser to navigate to the results. Refresh your browser several times to see random results.
+Use the route in your browser, or run the cURL command in your terminal, to navigate to the results. Refresh your browser several times to see random results.
+
+Valid routes include:  
+"/"  
+"/version"  
+"/quotes"  
+"/quotes/random"  
+"/quotes/0"  
+"/quotes/1"  
+"/quotes/2"  
+"/quotes/3"  
+"/quotes/4"  
+"/quotes/5"  
+
+Example:
