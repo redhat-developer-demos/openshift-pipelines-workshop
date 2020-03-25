@@ -167,7 +167,7 @@ We'll need to run the command `tkn resource create` twice, once for each resourc
 `tkn resource create`  
 Name: qotd-git  
 Type: git  
-Url: https://github.com/donschenck/qotd.git  
+Url: https://github.com/redhat-developer-demos/qotd.git  
 Revision: (leave blank)  
 
 `tkn resource create`  
