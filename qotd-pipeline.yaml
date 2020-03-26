@@ -12,7 +12,7 @@ spec:
   tasks:
     - name: golang-build
       taskRef:
-        name: s2i-go
+        name: buildah
         kind: ClusterTask
       resources:
         inputs:
