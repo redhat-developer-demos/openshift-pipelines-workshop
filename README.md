@@ -237,6 +237,10 @@ Step 3. Change the source code in "main.go" in the "qotd" repo that you forked a
 Step 4. Commit and push the change to your repo.  
 Step 5. Delete the qotd-git resource: `tkn resource delete qotd-git`  
 Step 6. Create the resource "qotd-git", pointing it to your repo. `tkn resource create`  
-Step 2. Run the pipeline start command again. `tkn pipeline start qotd-build-and-deploy`    
-Step 3. When the build is complete, view the resulting changes.  
+Step 7. Run the pipeline start command again. `tkn pipeline start qotd-build-and-deploy --last`    
+Step 8. When the build is complete, view the resulting changes.  
 
+Hint: This is a good command to run in a bash terminal session:  
+`while true; do sleep 1; curl <<your route here>>/quotes/random; done`
+
+<p style="text-align: center;">This marks the end of this workshop.</p>
