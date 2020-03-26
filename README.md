@@ -33,7 +33,7 @@ The following is a list of the environments and/or tools are necessary to perfor
 1. Tekton command line interface (CLI), `tkn`
 1. OpenShift CLI, `oc`
 1. Git
-1. Git repo at https://github.com/redhat-developer-demos/openshift-pipelines-tutorial.git. You'll need to clone this repo to your machine.
+1. Git repo at https://github.com/redhat-developer-demos/openshift-pipelines-tutorial.git. You'll need to fork this repo and then clone this repo to your machine.
 
 ### Prerequisite #1: A terminal session on your PC
 You'll need to be able to run commands at the command line on your PC. Note that this workshop works with Linux and macOS (bash) and Windows (PowerShell). Where any differences occur in this workshop, commands for both environments will be supplied.
@@ -136,7 +136,9 @@ This section declares what is done and in what order.
 
 Line 13 is a name that we've assigned; it could just as well be called 'foo'. The "taskRef", in lines 14 through 16, is where we call out exactly what to do and where to find it. 
 
-The name "s2i-go" (line 15) is a built-in "ClusterTask" (line 16), a task that is built into the OpenShift Pipelines. You can see this and all the other ClusterTasks by running the command `tkn clustertask ls`. A ClusterTask is available across *all* namespaces in the OpenShift cluster, while tasks that we have created are limited to the namespace in which they are created.
+The name "buildah" (line 15) is a built-in "ClusterTask" (line 16), a task that is built into the OpenShift Pipelines. You can see this and all the other ClusterTasks by running the command `tkn clustertask ls`. A ClusterTask is available across *all* namespaces in the OpenShift cluster, while tasks that we have created are limited to the namespace in which they are created.
+
+I'm using buildah to build the image. Since I have the file "Dockerfile" in my source code, this is a perfect choice. I can use the Dockerfile while developing and testing on my local machine, and then when I push the source to the git repo and use it in my pipeline, I can be assured the same build steps and resulting image will be used. I'm in control, and I like that.
 
 In line 30 we declare a task that we created (that happens later in this workshop). Notice line 36, which specifies that this task runs only after the task "golang-build" is completed.
 
@@ -222,4 +224,19 @@ Valid routes include:
 "/quotes/4"  
 "/quotes/5"  
 
-Example:
+Example:  
+`curl foo/quotes/random`
+
+### Workshop Optional Step 8: Push changes and see results
+
+This section is purposely kept terse. It is assumed that you have the technical skills for perform the steps listed.
+
+Step 1. Fork the repo at https://github.com/redhat-developer-demos/qotd.git to your own Github account.  
+Step 2. Clone your repo to your local machine.  
+Step 3. Change the source code in "main.go" in the "qotd" repo that you forked and cloned to your local PC.  
+Step 4. Commit and push the change to your repo.  
+Step 5. Delete the qotd-git resource: `tkn resource delete qotd-git`  
+Step 6. Create the resource "qotd-git", pointing it to your repo. `tkn resource create`  
+Step 2. Run the pipeline start command again. `tkn pipeline start qotd-build-and-deploy`    
+Step 3. When the build is complete, view the resulting changes.  
+
