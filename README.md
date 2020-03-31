@@ -243,4 +243,7 @@ Step 8. When the build is complete, view the resulting changes.
 Hint: This is a good command to run in a bash terminal session:  
 `while true; do sleep 1; curl <<your route here>>/quotes/random; done`
 
+Or in PowerShell:  
+`While($true) { curl <<your route here>>/quotes/random; sleep 1 }`
+
 <p style="text-align: center;">This marks the end of this workshop.</p>
