@@ -21,10 +21,12 @@ As an optional step, we will then move forward, using the automated CI/CD system
 
 The engine for this is OpenShift Pipelines. OpenShift Pipelines relies on Tekton, the container-based build component of Knative, and runs in pods. Because each step runs in it's own pod, the benefits include scaling and the ability to run steps in parallel.
 
-This example will feature code written in Go. A simple RESTful service, Quote Of The Day, will return a random quote via an HTTP Get request.
+This example will give you the choice of using code written in Go or C#. A simple RESTful service, Quote Of The Day, will return quotes via an HTTP GET request.
 
 Example:
 ![tkn resource ls results](images/curl-example.png)
+
+Note: While the screen captures in this document are based on PowerShell, rest assured that everything here works equally well in a bash shell.
 
 ## Prerequisites
 The following is a list of the environments and/or tools are necessary to perform this workshop. Details about each follow this list.
@@ -36,15 +38,22 @@ The following is a list of the environments and/or tools are necessary to perfor
 1. Git repo at https://github.com/redhat-developer-demos/openshift-pipelines-tutorial.git. You'll need to fork this repo and then clone this repo to your machine.
 
 ### Prerequisite #1: A terminal session on your PC
-You'll need to be able to run commands at the command line on your PC. Note that this workshop works with Linux and macOS (bash) and Windows (PowerShell). Where any differences occur in this workshop, commands for both environments will be supplied.
+You'll need to be able to run commands at the command line on your PC. Note that this workshop works with Linux and macOS (bash or PowerShell) and Windows (PowerShell). Where any differences between bash and PowerShell occur in this workshop, commands for both environments will be supplied.
+
+*Yes, PowerShell runs on Linux and macOS.*
 
 ### Prerequisite #2: OpenShift version 4.3 (or newer) cluster
-A not-trivial OpenShift 4.3 (or newer) cluster is necessary to run this workshop. Options include:
+An OpenShift 4.3 (or newer) cluster is necessary to run this workshop. Options include:
+* CodeReady Containers (CRC) **which is zero cost and runs on your local machine**.
 * Amazon Web Services (AWS)
 * Microsoft Azure
+* Google Cloud
 * vmware vSphere
+* Red Hat OpenStack Platform
+* Red Hat Virtualization
+* IBM Z IBM LineONE
+* Power Systems
 * Bare metal
-* CodeReady Workspaces, which runs on your local machine and requires 32GB of RAM and at least four CPUs.
 
 Visit the [OpenShift 4 web site at try.openshift.com](try.openshift.com) for instructions for your selected cloud-based infrastructure.
 
@@ -71,9 +80,19 @@ You will need the Git repo associated with this workshop.
 
 After cloning this repo, move into the directory where it is located (typically "openshift-pipelines-tutorial"). This will be the home directory for the remainder of this workshop.
 
+## NOT Prerequisites  
+
+It's worth noting here what you *do not* need to install. You do not need:
+* Go language support
+* C# (.NET Core) support
+* Make, MSBuild or any other build tools
+
+This is because all the build and deploy work is done in our OpenShift cluster. In fact, once the pipeline is built, you could do all your development work using [CodeReady Workspaces](https://developers.redhat.com/products/codeready-workspaces/overview) on, say, a Chromebook.
+
+
 ## Workshop
 The following list shows the seven steps that will be used to get our CI/CD pipeline up and running:
-1. Create projects
+1. Create a project
 1. Install operator
 1. Create Pipeline
 1. Create Tasks
@@ -85,7 +104,7 @@ The following list shows the seven steps that will be used to get our CI/CD pipe
  <div style="background-color: cornsilk; margin-left: 20px; margin-right: 20px">
 <h4>Operators and Subscriptions Explained</h4>  
 
-Because OpenShift is built on Kubernetes, it supports the concept of "Operators", or pre-built Customer Resource Descriptions (CRD) that include the sometimes many pieces needed to invoke a solution. In other words, a Kubernetes Operator can be used to start and maintain a complex solution. For example, there is a Kubernetes Operator that allows you to very easily get an instance of MongoDB running in your OpenShift cluster. There are others: Eclipse Che, Elasticsearch, Kafka, and dozens more.  
+Because OpenShift is built on Kubernetes, it supports the concept of "Operators", or pre-built Customer Resource Descriptions (CRD) that include the sometimes many pieces needed to invoke and sustain a solution. In other words, a Kubernetes Operator can be used to start and maintain a complex solution. For example, there is a Kubernetes Operator that allows you to very easily get an instance of MongoDB running in your OpenShift cluster. There are others: Eclipse Che, Elasticsearch, Kafka, and dozens more.  
 
 To invoke an operator *may* involve many steps. You install the Operator and the create a Subscription. In some cases, such as Kafka, you then invoke the API you want. For example, Kafka Connect or Kafka Topic.
   
@@ -94,9 +113,11 @@ For OpenShift Pipelines, one quick command will give us all we need.
 <hr>
 
 ### Workshop Step 0: Log in
-Before any work can begin, you must be logged into your OpenShift cluster with cluster-admin rights. Use the `oc login` command to do this.
+Before any work can begin, you must be logged into your OpenShift cluster with cluster-admin rights. Use the `oc login` command to do this. For example, on my Fedora 32 machine using CRC:
 
-### Workshop Step 1: Create projects
+`oc login -u kubeadmin -p 8rynV-SeYLc-h8Ij7-YPYcz https://api.crc.testing:6443`
+
+### Workshop Step 1: Create a project
 Create an OpenShift project in which we'll be working.  
 
 `oc new-project pipelines-tutorial`
@@ -128,7 +149,7 @@ This is the name assigned to the pipeline. This name *does not* need to match th
 
 This pipeline uses two resources: A git repo as the input and a Linux container as the output. That is to say, it will clone a git repo and build an image.
 
-Note that the resource _names_ are *not* the same thing as the resource *values*. In our example, the git repo resource name is "gotd-git", but that has no value. Later, when we create this resource, we'll give it a value, i.e. a URL that points to the repo.
+Note that the resource _names_ are *not* the same thing as the resource *values*. In our example, the git repo resource name is "qotd-git", but that has no value. Later, when we create this resource, we'll give it a value, i.e. a URL that points to the repo.
 
 #### Lines 13 through 36: tasks
 
@@ -136,11 +157,11 @@ This section declares what is done and in what order.
 
 Line 13 is a name that we've assigned; it could just as well be called 'foo'. The "taskRef", in lines 14 through 16, is where we call out exactly what to do and where to find it. 
 
-The name "buildah" (line 15) is a built-in "ClusterTask" (line 16), a task that is built into the OpenShift Pipelines. You can see this and all the other ClusterTasks by running the command `tkn clustertask ls`. A ClusterTask is available across *all* namespaces in the OpenShift cluster, while tasks that we have created are limited to the namespace in which they are created.
+The name "buildah" (line 15) is a built-in *ClusterTask* (line 16), a task that is built into the OpenShift Pipelines. You can see this and all the other ClusterTasks by running the command `tkn clustertask ls`. A ClusterTask is available across *all* namespaces in the OpenShift cluster, while tasks that we have created are limited to the namespace in which they are created.
 
-I'm using buildah to build the image. Since I have the file "Dockerfile" in my source code, this is a perfect choice. I can use the Dockerfile while developing and testing on my local machine, and then when I push the source to the git repo and use it in my pipeline, I can be assured the same build steps and resulting image will be used. I'm in control, and I like that.
+I'm using buildah to build the image. Since I have the file "Dockerfile" in my source code, this is an excellent choice. I can use the Dockerfile while developing and testing on my local machine, and then when I push the source to the git repo and use it in my pipeline, I can be assured the same build steps and resulting image will be used. I'm in control, and I like that.
 
-In line 30 we declare a task that we created (that happens later in this workshop). Notice line 36, which specifies that this task runs only after the task "golang-build" is completed.
+In line 30 we declare a task that we created (creating a Task happens later in this workshop). Notice line 36, which specifies that this task runs only after the task "image-build" is completed.
 
 With that knowledge, let's create the pipeline:
 
@@ -154,9 +175,17 @@ Example:
 
 ### Workshop Step 4: Create tasks  
 
-Because we're using the "s2i-go" ClusterTask to build the Go program, the only task we need to create in our namespace is the "apply-manifests" task. As good fortune would have it, we don't even need to create this from scratch. It's a part of the OpenShift Pipelines catalog, a collection of open source, reusable tasks. The catalog can be found at https://github.com/openshift/pipelines-catalog.
+After our pipeline builds the image and places it into the OpenShift project's registry, the only task we need to create in our namespace is the "apply-manifests" task. As good fortune would have it, we don't even need to create this from scratch. It's a part of the OpenShift Pipelines catalog, a collection of open source, reusable tasks. The catalog can be found at https://github.com/openshift/pipelines-catalog.
 
-`oc create -f https://raw.githubusercontent.com/openshift/pipelines-tutorial/master/01_pipeline/01_apply_manifest_task.yaml`
+Here is the command to create the "apply-manifests" task:  
+
+`oc create -f apply_manifest_task.yaml`
+
+The "apply-manifests" task will find the YAML files in the git repo's "k8s" directory and apply them to our application. Knowing this, our source repos will have a "k8s" directory with three manifests: a Deployment Config, a Service, and a Route. You can view these by looking in the source repos:
+
+* https://github.com/redhat-developer.demos/qotd.git
+* https://github.com/donschenck/qotd-csharp.git
+
 
 ### Step 5: Create pipeline resources  
 
@@ -169,8 +198,11 @@ We'll need to run the command `tkn resource create` twice, once for each resourc
 `tkn resource create`  
 Name: qotd-git  
 Type: git  
-Url: https://github.com/redhat-developer-demos/qotd.git  
+Url: https://github.com/redhat-developer-demos/qotd.git  **OR** 
+  https://github.com/donschenck/qotd-csharp.git  
 Revision: (leave blank)  
+
+**NOTE**: The choice of URL depends on whether you want to use the Go source code or the C# source code. By design, they both yield the same results when they run.  
 
 `tkn resource create`  
 Name: qotd-image  
