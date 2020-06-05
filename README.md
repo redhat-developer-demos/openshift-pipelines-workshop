@@ -139,19 +139,19 @@ Example:
 ### Workshop Step 3: Create pipeline  
 The next step is to create the pipeline we want to use. The following pipeline is discussed following this image:
 
-![pipeline.png](images/pipeline.png)
+![pipeline.png](images/qotd-pipeline.png)
 
 #### Line 4: name
 
 This is the name assigned to the pipeline. This name *does not* need to match the name of the file used to create this pipeline. In fact, in this particular example, the file is named "qotd-pipeline.yaml" while the pipeline, *inside of your OpenShift cluster*, is named "qotd-build-and-deploy". It is probably a good idea to make the names match; this is a management issue.
 
-#### Lines 6 through 10: resource
+#### Lines 6 through 10: resources
 
 This pipeline uses two resources: A git repo as the input and a Linux container as the output. That is to say, it will clone a git repo and build an image.
 
 Note that the resource _names_ are *not* the same thing as the resource *values*. In our example, the git repo resource name is "qotd-git", but that has no value. Later, when we create this resource, we'll give it a value, i.e. a URL that points to the repo.
 
-#### Lines 13 through 36: tasks
+#### Lines 12 through 36: tasks
 
 This section declares what is done and in what order.
 
@@ -161,7 +161,7 @@ The name "buildah" (line 15) is a built-in *ClusterTask* (line 16), a task that 
 
 I'm using buildah to build the image. Since I have the file "Dockerfile" in my source code, this is an excellent choice. I can use the Dockerfile while developing and testing on my local machine, and then when I push the source to the git repo and use it in my pipeline, I can be assured the same build steps and resulting image will be used. I'm in control, and I like that.
 
-In line 30 we declare a task that we created (creating a Task happens later in this workshop). Notice line 36, which specifies that this task runs only after the task "image-build" is completed.
+In line 30 we declare a task that we created (creating a Task happens later in this workshop). Notice line 36, which specifies that this task runs only *after* the task "image-build" is completed.
 
 With that knowledge, let's create the pipeline:
 
