@@ -10,7 +10,7 @@ spec:
       type: image
 
   tasks:
-    - name: golang-build
+    - name: image-build
       taskRef:
         name: buildah
         kind: ClusterTask
@@ -33,5 +33,5 @@ spec:
           - name: source
             resource: qotd-git
       runAfter:
-        - golang-build
+        - image-build
 
