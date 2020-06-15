@@ -1,7 +1,8 @@
 # openshift-pipelines-workshop
 ## Workshop to demonstrate OpenShift Pipelines (featuring Tekton).
 
-**All** are welcome: Linux, macOS and Windows.
+**All** are welcome: Linux, macOS and Windows.  
+**Development Languages**: Go, Python or C#.
 
 ## Description
 This workshop will guide you through the creation, execution and ongoing use of OpenShift Pipelines, a CI/CD instance that runs in an OpenShift cluster. You will learn how OpenShift Pipelines are installed, how they are configured, how they are run, how to handle the results, and how to continue a development cycle using this CI/CD environment.
@@ -21,7 +22,7 @@ As an optional step, we will then move forward, using the automated CI/CD system
 
 The engine for this is OpenShift Pipelines. OpenShift Pipelines relies on Tekton, the container-based build component of Knative, and runs in pods. Because each step runs in it's own pod, the benefits include scaling and the ability to run steps in parallel.
 
-This example will give you the choice of using code written in Go or C#. A simple RESTful service, Quote Of The Day, will return quotes via an HTTP GET request.
+This example will give you the choice of using code written in Go, Python, or C#. A simple RESTful service, Quote Of The Day, will return quotes via an HTTP GET request.
 
 Example:
 ![tkn resource ls results](images/curl-example.png)
@@ -35,7 +36,7 @@ The following is a list of the environments and/or tools are necessary to perfor
 1. Tekton command line interface (CLI), `tkn`
 1. OpenShift CLI, `oc`
 1. Git
-1. Git repo at https://github.com/redhat-developer-demos/openshift-pipelines-tutorial.git. You'll need to fork this repo and then clone this repo to your machine.
+1. Git repo at https://github.com/redhat-developer-demos/openshift-pipelines-tutorial.git. You'll need to clone or download this repo to your machine.
 
 ### Prerequisite #1: A terminal session on your PC
 You'll need to be able to run commands at the command line on your PC. Note that this workshop works with Linux and macOS (bash or PowerShell) and Windows (PowerShell). Where any differences between bash and PowerShell occur in this workshop, commands for both environments will be supplied.
@@ -84,6 +85,7 @@ After cloning this repo, move into the directory where it is located (typically 
 
 It's worth noting here what you *do not* need to install. You do not need:
 * Go language support
+* Python language support
 * C# (.NET Core) support
 * Make, MSBuild or any other build tools
 
@@ -115,11 +117,11 @@ For OpenShift Pipelines, one quick command will give us all we need.
 ### Workshop Step 0: Log in
 Before any work can begin, you must be logged into your OpenShift cluster with cluster-admin rights. Use the `oc login` command to do this. For example, on my Fedora 32 machine using CRC:
 
-`oc login -u kubeadmin -p 8rynV-SeYLc-h8Ij7-YPYcz https://api.crc.testing:6443`
+`oc login -u kubeadmin -p 8rynV-SeYLc-h8Ij7-YPYcz https://api.crc.testing:6443`  
 
 ### Workshop Step 1: Create a project
 Create an OpenShift project in which we'll be working.  
-
+oc
 `oc new-project pipelines-tutorial`
 
 Example:
@@ -160,6 +162,9 @@ Line 13 is a name that we've assigned; it could just as well be called 'foo'. Th
 The name "buildah" (line 15) is a built-in *ClusterTask* (line 16), a task that is built into the OpenShift Pipelines. You can see this and all the other ClusterTasks by running the command `tkn clustertask ls`. A ClusterTask is available across *all* namespaces in the OpenShift cluster, while tasks that we have created are limited to the namespace in which they are created.
 
 I'm using buildah to build the image. Since I have the file "Dockerfile" in my source code, this is an excellent choice. I can use the Dockerfile while developing and testing on my local machine, and then when I push the source to the git repo and use it in my pipeline, I can be assured the same build steps and resulting image will be used. I'm in control, and I like that.
+
+How to we know what resources the "buildah" ClusterTask needs? We can run the command `tkn clustertask describe buildah` to see the details.
+
 
 In line 30 we declare a task that we created (creating a Task happens later in this workshop). Notice line 36, which specifies that this task runs only *after* the task "image-build" is completed.
 
