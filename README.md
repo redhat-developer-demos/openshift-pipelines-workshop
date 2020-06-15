@@ -163,7 +163,16 @@ The name "buildah" (line 15) is a built-in *ClusterTask* (line 16), a task that 
 
 I'm using buildah to build the image. Since I have the file "Dockerfile" in my source code, this is an excellent choice. I can use the Dockerfile while developing and testing on my local machine, and then when I push the source to the git repo and use it in my pipeline, I can be assured the same build steps and resulting image will be used. I'm in control, and I like that.
 
-How to we know what resources the "buildah" ClusterTask needs? We can run the command `tkn clustertask describe buildah` to see the details.
+<hr>
+ <div style="background-color: cornsilk; margin-left: 20px; margin-right: 20px">
+How to we know what resources the "buildah" ClusterTask needs? We can run the command `tkn clustertask describe buildah` to see the details. in the following you can see the input and output resources.
+
+`tkn clustertask describe buildah` output:
+
+
+![tkn clustertask describe buildah](images/tkn-clustertask-describe-buildah.png)
+</div>
+<hr>
 
 
 In line 30 we declare a task that we created (creating a Task happens later in this workshop). Notice line 36, which specifies that this task runs only *after* the task "image-build" is completed.
@@ -190,6 +199,7 @@ The "apply-manifests" task will find the YAML files in the git repo's "k8s" dire
 
 * https://github.com/redhat-developer.demos/qotd.git
 * https://github.com/donschenck/qotd-csharp.git
+* https://github.com/donschenck/qotd-python.git
 
 
 ### Step 5: Create pipeline resources  
@@ -204,7 +214,7 @@ We'll need to run the command `tkn resource create` twice, once for each resourc
 Name: qotd-git  
 Type: git  
 Url: https://github.com/redhat-developer-demos/qotd.git  **OR** 
-  https://github.com/donschenck/qotd-csharp.git  
+  https://github.com/donschenck/qotd-csharp.git  **OR** https://github.com/donschenck/qotd-python.git  
 Revision: (leave blank)  
 
 **NOTE**: The choice of URL depends on whether you want to use the Go source code or the C# source code. By design, they both yield the same results when they run.  
