@@ -274,23 +274,35 @@ Valid routes include:
 Example:  
 `curl foo/quotes/random`
 
-### Workshop Optional Step 8: Push changes and see results
+### Workshop Optional Step 8: Make changes and see results
 
-This section is purposely kept terse. It is assumed that you have the technical skills for perform the steps listed.
+In this optional step, the git repo location is changed and the pipeline is started. This will result in a different image being run. This change can be observed by running a `cURL` loop and watching the results.
 
-Step 1. Fork the repo at https://github.com/redhat-developer-demos/qotd.git to your own Github account.  
-Step 2. Clone your repo to your local machine.  
-Step 3. Change the source code in "main.go" in the "qotd" repo that you forked and cloned to your local PC.  
-Step 4. Commit and push the change to your repo.  
-Step 5. Delete the qotd-git resource: `tkn resource delete qotd-git`  
-Step 6. Create the resource "qotd-git", pointing it to your repo. `tkn resource create`  
-Step 7. Run the pipeline start command again. `tkn pipeline start qotd-build-and-deploy --last`    
-Step 8. When the build is complete, view the resulting changes.  
+What we will do is change the value of the Pipeline Resource "qotd-git" to point to a differnet Github repo.
 
-Hint: This is a good command to run in a bash terminal session:  
-`while true; do sleep 1; curl <<your route here>>/quotes/random; done`
+Start by running the cURL command at the command line:
 
-Or in PowerShell:  
-`While($true) { curl <<your route here>>/quotes/random; sleep 1 }`
+(bash)  
+`while true; do sleep 1; curl <<your route here>>/writtenin; curl <<your route here>>/quotes/random; done`
+
+(PowerShell)  
+`While($true) { $(curl <<your route here>>writtenin).Content; $(curl <<your route here>>/quotes/random).Content; sleep 1 }`
+
+Use **one** of the following commands to change the Pipeline. Choose a command that will result in a language you *did not* choose earlier in the workshop.
+
+**NOTE**: The `oc patch` commands here *will not* work in PowerShell. You'll either need to run them at a Linux command line (using Windows Subsystem for Linux) or alter the YAML for the Pipeline Resource using the web dashboard.
+
+`oc patch pipelineresource -n pipelines-tutorial qotd-git --type=json -p '[{"op":"replace","path":"/spec/params/0/value","value":"https://github.com/donschenck/qotd-python.git"}]'`
+
+`oc patch pipelineresource -n pipelines-tutorial qotd-git --type=json -p '[{"op":"replace","path":"/spec/params/0/value","value":"https://github.com/donschenck/qotd-csharp.git"}]'`
+
+`oc patch pipelineresource -n pipelines-tutorial qotd-git --type=json -p '[{"op":"replace","path":"/spec/params/0/value","value":"https://github.com/redhat-developer-demos/qotd.git"}]'`
+
+Run the following command to re-run the pipeline:  
+`tkn pipeline start qotd-build-and-deploy --last`
+
+This will start the pipeline using the new value for the source code Github repo.
+
+After a few minutes you should see the results of your cURL loop change.
 
 <p style="text-align: center;">This marks the end of this workshop.</p>
