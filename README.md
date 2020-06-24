@@ -163,16 +163,11 @@ The name "buildah" (line 15) is a built-in *ClusterTask* (line 16), a task that 
 
 I'm using buildah to build the image. Since I have the file "Dockerfile" in my source code, this is an excellent choice. I can use the Dockerfile while developing and testing on my local machine, and then when I push the source to the git repo and use it in my pipeline, I can be assured the same build steps and resulting image will be used. I'm in control, and I like that.
 
-<hr>
- <div style="background-color: cornsilk; margin-left: 20px; margin-right: 20px">
-How to we know what resources the "buildah" ClusterTask needs? We can run the command `tkn clustertask describe buildah` to see the details. in the following you can see the input and output resources.
+ How to we know what resources the "buildah" ClusterTask needs? We can run the command `tkn clustertask describe buildah` to see the details. in the following you can see the input and output resources.
 
-`tkn clustertask describe buildah` output:  
+Output from `tkn clustertask describe buildah`:  
 
 ![tkn clustertask describe buildah](images/tkn-clustertask-describe-buildah.png)  
-
-</div>
-<hr>
 
 
 In line 30 we declare a task that we created (creating a Task happens later in this workshop). Notice line 36, which specifies that this task runs only *after* the task "image-build" is completed.
