@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: qotd-build-and-deploy-to-quay
+spec:
+  resources:
+    - name: qotd-git
+      type: git
+    - name: qotd-image
+      type: image
+
+  tasks:
+    - name: image-build
+      taskRef:
+        name: buildah
+        kind: ClusterTask
+      resources:
+        inputs:
+          - name: source
+            resource: qotd-git
+        outputs:
+          - name: image
+            resource: qotd-quay-image
+      params:
+        - name: TLSVERIFY
+          value: "false"
