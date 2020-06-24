@@ -167,10 +167,10 @@ I'm using buildah to build the image. Since I have the file "Dockerfile" in my s
  <div style="background-color: cornsilk; margin-left: 20px; margin-right: 20px">
 How to we know what resources the "buildah" ClusterTask needs? We can run the command `tkn clustertask describe buildah` to see the details. in the following you can see the input and output resources.
 
-`tkn clustertask describe buildah` output:
+`tkn clustertask describe buildah` output:  
 
+![tkn clustertask describe buildah](images/tkn-clustertask-describe-buildah.png)  
 
-![tkn clustertask describe buildah](images/tkn-clustertask-describe-buildah.png)
 </div>
 <hr>
 
