@@ -6,9 +6,8 @@ spec:
   resources:
     - name: qotd-git
       type: git
-    - name: qotd-image
+    - name: qotd-quay-image
       type: image
-
   tasks:
     - name: image-build
       taskRef:
