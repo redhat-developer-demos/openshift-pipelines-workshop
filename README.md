@@ -1,11 +1,14 @@
-# openshift-pipelines-workshop
 ## Workshop to demonstrate OpenShift Pipelines (featuring Tekton).
 
 **All** are welcome: Linux, macOS and Windows.  
-**Development Languages**: Go, Python or C#.
+**Development Languages supported in this workshop**:
+* Go
+* Node.js
+* C#
+* Python
 
 ## Description
-This workshop will guide you through the creation, execution and ongoing use of OpenShift Pipelines, a CI/CD instance that runs in an OpenShift cluster. You will learn how OpenShift Pipelines are installed, how they are configured, how they are run, how to handle the results, and how to continue a development cycle using this CI/CD environment.
+This workshop will guide you through the creation, execution and ongoing use of Tekton with OpenShift Pipelines, a CI/CD instance that runs in an OpenShift cluster. You will learn how OpenShift Pipelines are installed, how they are configured, how they are run, how to handle the results, and how to continue a development cycle using this CI/CD environment.
 
 ## Table Of Contents
 * [Introduction](#Introduction)
@@ -16,15 +19,15 @@ This workshop will guide you through the creation, execution and ongoing use of 
 
 
 ## Introduction
-Delivering working code is the goal of software developement. Undelivered code is worthless; we need to get bits into production. It's sometimes easy to lose sight of this given the distractions of new technologies, the latest methodologies, changing frameworks, etc. In the end, however, it's about working code running in production. In this workshop we'll start with a fresh, new OpenShift cluster and finish with an automated CI/CD system -- OpenShift Pipelines -- running in that cluster. Here, in one place, the end-to-end story.
+Delivering working code is the goal of software developement. Undelivered code is worthless; we need to get bits into production. It is sometimes easy to lose sight of this given the distractions of new technologies, the latest methodologies, changing frameworks, etc. In the end, however, it's about working code running in production. In this workshop we'll start with a fresh, new OpenShift cluster and finish with an automated CI/CD system -- Tekton with OpenShift Pipelines -- running in that cluster. Here, in one place: An end-to-end story.
 
 As an optional step, we will then move forward, using the automated CI/CD system as we update and push source code. This will complete the cycle of creating source code, updating source code, and updating the compiled bits that are running in an OpenShift pod.
 
 The engine for this is OpenShift Pipelines. OpenShift Pipelines relies on Tekton, the container-based build component of Knative, and runs in pods. Because each step runs in it's own pod, the benefits include scaling and the ability to run steps in parallel.
 
-This example will give you the choice of using code written in Go, Python, or C#. A simple RESTful service, Quote Of The Day, will return quotes via an HTTP GET request.
+This example will give you the choice of using code written in Go, Node.js, C#, or Python. A simple RESTful service, Quote Of The Day, will return quotes via an HTTP GET request.
 
-Example:
+Here's an example of a cURL command against the service (this is PowerShell):
 ![tkn resource ls results](images/curl-example.png)
 
 Note: While the screen captures in this document are based on PowerShell, rest assured that everything here works equally well in a bash shell.
@@ -36,7 +39,7 @@ The following is a list of the environments and/or tools are necessary to perfor
 1. Tekton command line interface (CLI), `tkn`
 1. OpenShift CLI, `oc`
 1. Git
-1. Git repo at https://github.com/redhat-developer-demos/openshift-pipelines-tutorial.git. You'll need to clone or download this repo to your machine.
+1. Git repo at https://github.com/redhat-developer-demos/openshift-pipelines-tutorial.git. You'll need to clone or download this repo to your machine in order to run the commands contained in this workshop.
 
 ### Prerequisite #1: A terminal session on your PC
 You'll need to be able to run commands at the command line on your PC. Note that this workshop works with Linux and macOS (bash or PowerShell) and Windows (PowerShell). Where any differences between bash and PowerShell occur in this workshop, commands for both environments will be supplied.
@@ -87,6 +90,7 @@ It's worth noting here what you *do not* need to install. You do not need:
 * Go language support
 * Python language support
 * C# (.NET Core) support
+* Node.js support
 * Make, MSBuild or any other build tools
 
 This is because all the build and deploy work is done in our OpenShift cluster. In fact, once the pipeline is built, you could do all your development work using [CodeReady Workspaces](https://developers.redhat.com/products/codeready-workspaces/overview) on, say, a Chromebook.
@@ -121,25 +125,33 @@ Before any work can begin, you must be logged into your OpenShift cluster with c
 
 ### Workshop Step 1: Create a project
 Create an OpenShift project in which we'll be working.  
-oc
+
 `oc new-project pipelines-tutorial`
 
 Example:
 ![tkn resource ls results](images/oc-new-project.png)
 
 ### Workshop Step 2: Install operator
-When it comes to installing the OpenShift Pipelines Operator, you have two choices: Use the web UI dashboard or use the command line. For this workshop, we'll be using the command line. 
+When it comes to installing the OpenShift Pipelines Operator, you have two choices: Use the web UI dashboard or use the command line. For this workshop, we'll be using the cluster dashboard.
 
-#### Installing the Pipelines operator using the command line.  
-This will install the Pipelines operator and make it available for use.  
+After selecting the OperatorHub option from the menu on the left, type in the word "pipelines" to filter the results. You'll see the Red Hat OpenShift Pipelines operator card.
 
-`oc apply -f sub.yaml`
+![pipelines operator card](images/pipelines-tutorial-search-operator-hub.png)
 
-Example:
-![oc apply -f sub.yaml](images/oc-apply-sub.png)
+When you click on the card, you will be prompted to start the installation process:
+
+![pipelines install prompt number 1](images/pipelines-tutorial-install-prompt-1.png)
+
+After you click the Install button, you will be prompted to provide details for the installation. Use the default values and click Install. The installation will execute:
+
+![pipelines install prompt for parameters](images/pipelines-tutorial-install-prompt-2.png)
+
+The installation is complete when the status shows "Succeeded":
+
+![pipelines installed](images/pipelines-installed.png)
 
 ### Workshop Step 3: Create pipeline  
-The next step is to create the pipeline we want to use. The following pipeline is discussed following this image:
+The next step is to create the pipeline we want to use. The following pipeline is discussed following this image, which is in the file "qotd-pipeline.yaml" in the repository:
 
 ![pipeline.png](images/qotd-pipeline.png)
 
@@ -195,30 +207,36 @@ The "apply-manifests" task will find the YAML files in the git repo's "k8s" dire
 * https://github.com/redhat-developer.demos/qotd.git
 * https://github.com/donschenck/qotd-csharp.git
 * https://github.com/donschenck/qotd-python.git
+* https://github.com/donschenck/qotd-nodejs.git
 
+The files in the "k8s" directory will create a deployment for our application, create a service that points to the deployed pod, and a route that allows you to access the service from outside of your cluster. If these we not created, the pipeline would simply create an imagestream and nothing more. There may be cases where this is desired, such as creating an image and pushing it to a public image registry such as quay.io.
 
 ### Step 5: Create pipeline resources  
 
-We need to create two resources:
+We need to create two resources. The names must match the resources specified in the pipeline: qotd-git and qotd-image.  
+
 * qotd-git - defines the location of the github repo containing the source code to be compiled into an image
 * qotd-image - defines the location of the created image
 
-We'll need to run the command `tkn resource create` twice, once for each resource. Here are the values needed:
+Note that the *name* of the resource, the *file name* of the YAML file describing the resource, and the *value* of the resource are in no way related. In fact, we have four different YAML files in the repo that all do the same thing: Create a resource named "qotd-git". They each have a different value.
 
-`tkn resource create`  
-Name: qotd-git  
-Type: git  
-Url: https://github.com/redhat-developer-demos/qotd.git  **OR** 
-  https://github.com/donschenck/qotd-csharp.git  **OR** https://github.com/donschenck/qotd-python.git  
-Revision: (leave blank)  
+You can view this by looking inside the following four files:
+* qotd-git-csharp-resource.yaml
+* qotd-git-go-resource.yaml
+* qotd-git-python-resource.yaml
+* qotd-git-nodejs-resource.yaml
 
-**NOTE**: The choice of URL depends on whether you want to use the Go source code or the C# source code. By design, they both yield the same results when they run.  
+As you might suspect, each is written in a different programming language; they all give the same results.
 
-`tkn resource create`  
-Name: qotd-image  
-Type: image  
-Url: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/qotd:latest  
-Digest: (leave blank)  
+You *can* create a ressource by running the command `tkn resource create` and following the prompts, but we're going to use the command line and a YAML file; it's much more "DevOps"-y.
+
+Choose any of the four qotd-git-* YAML files and create the "qotd-git" resource:
+
+`oc create -f qotd-git-go-resource.yaml`
+
+In the repo, we have two YAML files that will create the resource "qotd-image": One points to the cluster's internal image registry, while the other writes the image to quay.io. For this workshop, we'll be using the internal registry. Run the following command to create the resource "qotd-image":
+
+`oc create -f qotd-image-pipelineresource.yaml`
 
 We can view the results by running `tkn resource ls`  
 
@@ -256,6 +274,7 @@ Use the route in your browser, or run the cURL command in your terminal, to navi
 
 Valid routes include:  
 "/"  
+"/writtenin"
 "/version"  
 "/quotes"  
 "/quotes/random"  
@@ -267,7 +286,7 @@ Valid routes include:
 "/quotes/5"  
 
 Example:  
-`curl foo/quotes/random`
+`curl http://qotd-pipelines-tutorial.apps-crc.testing/quotes/random`
 
 ### Workshop Optional Step 8: Make changes and see results
 
@@ -283,15 +302,19 @@ Start by running the cURL command at the command line:
 (PowerShell)  
 `While($true) { $(curl <<your route here>>writtenin).Content; $(curl <<your route here>>/quotes/random).Content; sleep 1 }`
 
-Use **one** of the following commands to change the Pipeline. Choose a command that will result in a language you *did not* choose earlier in the workshop.
+A bash shell example:  
 
-**NOTE**: The `oc patch` commands here *will not* work in PowerShell. You'll either need to run them at a Linux command line (using Windows Subsystem for Linux) or alter the YAML for the Pipeline Resource using the web dashboard.
+`while true; do sleep .25; curl http://qotd-pipelines-tutorial.apps-crc.testing/writtenin; curl http://qotd-pipelines-tutorial.apps-crc.testing/quotes/random; done`
 
-`oc patch pipelineresource -n pipelines-tutorial qotd-git --type=json -p '[{"op":"replace","path":"/spec/params/0/value","value":"https://github.com/donschenck/qotd-python.git"}]'`
 
-`oc patch pipelineresource -n pipelines-tutorial qotd-git --type=json -p '[{"op":"replace","path":"/spec/params/0/value","value":"https://github.com/donschenck/qotd-csharp.git"}]'`
+You could choose the `oc patch...` command to update your qotd-git resource, but instead it's much easier to simply apply changes from a different YAML file.
 
-`oc patch pipelineresource -n pipelines-tutorial qotd-git --type=json -p '[{"op":"replace","path":"/spec/params/0/value","value":"https://github.com/redhat-developer-demos/qotd.git"}]'`
+**Any one** of the following commands will work; choose the one that is *not* the language you are currently using (Go if you're following this tutorial to the letter):
+
+`oc apply -f qotd-git-csharp-resource.yaml`  
+`oc apply -f qotd-git-go-resource.yaml`  
+`oc apply -f qotd-git-python-resource.yaml`  
+`oc apply -f qotd-git-nodejs-resource.yaml`  
 
 Run the following command to re-run the pipeline:  
 `tkn pipeline start qotd-build-and-deploy --last`
