@@ -1,0 +1,11 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: qotd-app
+spec:
+  params:
+  - name: qotd-git
+    value: $(body.repository.url)
+  - name: git-repo-name
+    value: $(body.repository.name)
+    

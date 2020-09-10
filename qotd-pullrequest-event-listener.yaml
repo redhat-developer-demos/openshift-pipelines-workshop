@@ -1,0 +1,11 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: qotd-app
+spec:
+  serviceAccountName: pipeline
+  triggers:
+  - bindings:
+    - name: qotd-app
+    template:
+      name: qotd-app
