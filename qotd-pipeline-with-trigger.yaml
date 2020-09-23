@@ -1,0 +1,52 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: qotd-build-and-deploy
+spec:
+  params:
+    - name: qotd-git
+      description: URL of git repository containing source code to be built
+    - name: qotd-image
+      description: URL of container image to be built, i.e. output path
+  workspaces:
+  - name: output
+    description: |
+      This workspace will receive the cloned git repo and be passed
+      to the next Task
+
+  tasks:
+    - name: clone-repo
+      taskRef: 
+        name: git-clone
+        kind: ClusterTask
+      params:
+        - name: url
+          value: $(params.qotd-git)
+      workspaces:
+      - name: output
+        workspace: output
+
+    - name: image-build
+      taskRef:
+        name: buildah
+      params:
+        - name: IMAGE
+          value: $(params.qotd-image)
+        - name: TLSVERIFY
+          value: "false"
+        - name: CONTEXT
+          value: "."
+      workspaces:
+      - name: source
+        workspace: output
+      runAfter:
+        - clone-repo
+
+    - name: apply-manifests
+      taskRef:
+        name: apply-manifests
+      workspaces:
+      - name: source
+        workspace: output
+      runAfter:
+        - image-build

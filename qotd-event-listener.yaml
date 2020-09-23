@@ -5,7 +5,8 @@ metadata:
 spec:
   serviceAccountName: pipeline
   triggers:
-  - bindings:
     - name: qotd-app
-    template:
-      name: qotd-app
+      bindings:
+        - ref: qotd-app
+      template:
+        name: qotd-app

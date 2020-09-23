@@ -13,13 +13,22 @@ spec:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
-      name: qotd-build-and-deploy-$(params.git-repo-name)-$(uid)
+      name: qotd-build-and-deploy-$(uid)
     spec:
       serviceAccountName: pipeline
       pipelineRef:
         name: qotd-build-and-deploy
+      workspaces:
+      - name: output
+        volumeClaimTemplate:
+          spec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 1Gi
       params:
       - name: qotd-git
-        value: $(tt.params.git-repo-url)
+        value: $(params.qotd-git)
       - name: qotd-image
-        value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/$(tt.params.git-repo-name)
+        value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/qotd:latest
