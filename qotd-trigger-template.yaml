@@ -26,9 +26,9 @@ spec:
             - ReadWriteOnce
             resources:
               requests:
-                storage: 1Gi
+                storage: 900Mi
       params:
       - name: qotd-git
         value: $(params.qotd-git)
       - name: qotd-image
-        value: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/qotd:latest
+        value: image-registry.openshift-image-registry.svc:5000/trigger-demo/$(params.git-repo-name):latest
