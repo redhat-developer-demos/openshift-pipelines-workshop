@@ -44,7 +44,7 @@ spec:
 
     - name: apply-manifests
       taskRef:
-        name: apply-manifests
+        name: apply-manifests-for-triggers
       workspaces:
       - name: source
         workspace: output

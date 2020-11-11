@@ -6,5 +6,5 @@ spec:
   params:
     - name: url
       value: >-
-        image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/qotd:latest
+        image-registry.openshift-image-registry.svc:5000/rhn-engineering-dschenck-dev/qotd:latest
   type: image

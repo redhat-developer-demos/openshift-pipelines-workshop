@@ -5,5 +5,5 @@ metadata:
 spec:
   params:
     - name: url
-      value: 'quay.io/donschenck/qotd:special'
+      value: 'quay.io/donschenck/qotd:nov11.1'
   type: image

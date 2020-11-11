@@ -32,3 +32,4 @@ spec:
         value: $(params.qotd-git)
       - name: qotd-image
         value: image-registry.openshift-image-registry.svc:5000/trigger-demo/$(params.git-repo-name):latest
+        
