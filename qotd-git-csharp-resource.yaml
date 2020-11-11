@@ -2,7 +2,6 @@ apiVersion: tekton.dev/v1alpha1
 kind: PipelineResource
 metadata:
   name: qotd-git
-  namespace: pipelines-tutorial
 spec:
   params:
     - name: url
