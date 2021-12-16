@@ -1,12 +1,10 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: apply-manifests
 spec:
-  inputs:
-    resources:
-      - type: git
-        name: source
+  workspaces:
+  - name: shared-workspace  
   params:
   - name: manifest_dir
     description: The directory in source that contains yaml manifests

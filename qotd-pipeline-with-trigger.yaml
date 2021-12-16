@@ -13,7 +13,6 @@ spec:
     description: |
       This workspace will receive the cloned git repo and be passed
       to the next Task
-
   tasks:
     - name: clone-repo
       taskRef: 
@@ -25,7 +24,6 @@ spec:
       workspaces:
       - name: output
         workspace: output
-
     - name: image-build
       taskRef:
         name: buildah
@@ -41,7 +39,6 @@ spec:
         workspace: output
       runAfter:
         - clone-repo
-
     - name: apply-manifests
       taskRef:
         name: apply-manifests-for-triggers

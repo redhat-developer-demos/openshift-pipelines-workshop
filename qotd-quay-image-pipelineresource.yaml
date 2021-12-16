@@ -1,9 +1,0 @@
-apiVersion: tekton.dev/v1alpha1
-kind: PipelineResource
-metadata:
-  name: qotd-quay-image
-spec:
-  params:
-    - name: url
-      value: 'quay.io/donschenck/qotd:nov11.1'
-  type: image
