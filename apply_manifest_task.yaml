@@ -4,7 +4,7 @@ metadata:
   name: apply-manifests
 spec:
   workspaces:
-  - name: shared-workspace  
+  - name: source  
   params:
   - name: manifest_dir
     description: The directory in source that contains yaml manifests

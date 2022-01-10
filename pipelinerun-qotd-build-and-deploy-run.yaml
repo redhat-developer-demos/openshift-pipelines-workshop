@@ -1,0 +1,22 @@
+﻿apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: qotd-build-and-deploy-pipelinerun-
+spec:
+  params:
+    - name: IMAGE
+      value: >-
+        image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/qotd:latest
+    - name: git-url
+      value: 'https://github.com/redhat-developer-demos/qotd.git'
+  pipelineRef:
+    name: qotd-build-and-deploy
+  workspaces: 
+  - name: shared-workspace
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 500Mi
