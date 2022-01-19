@@ -19,9 +19,9 @@ This workshop will guide you through the creation, execution and ongoing use of 
 
 
 ## Introduction
-Delivering working code is the goal of software developement. Undelivered code is worthless; we need to get bits into production. It is sometimes easy to lose sight of this given the distractions of new technologies, the latest methodologies, changing frameworks, etc. In the end, however, it's about working code running in production. In this workshop we'll start with a fresh, new OpenShift cluster and finish with an automated CI/CD system -- Tekton with OpenShift Pipelines -- running in that cluster. Here, in one place: An end-to-end story.
+Delivering working code is the goal of software developement. Undelivered code is worthless; we need to get bits into production. It is sometimes easy to lose sight of this given the distractions of new technologies, the latest methodologies, changing frameworks, etc. In the end, however, it's about working code running in production. In this workshop we'll start with a fresh, new OpenShift cluster and finish with an automated CI/CD system — Tekton with OpenShift Pipelines — running in that cluster. Here, in one place: An end-to-end story.
 
-As an optional step, we will then move forward, using the automated CI/CD system as we update and push source code. This will complete the cycle of creating source code, updating source code, and updating the compiled bits that are running in an OpenShift pod.
+As an optional step, we will then move forward, using the automated CI/CD system as we update and push source code back to the git repository. This will complete the cycle of creating source code, updating source code, and updating the compiled bits that are running in an OpenShift pod.
 
 The engine for this is OpenShift Pipelines. OpenShift Pipelines relies on Tekton, the container-based build component of Knative, and runs in pods. Because each step runs in it's own pod, the benefits include scaling and the ability to run steps in parallel.
 
