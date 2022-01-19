@@ -27,10 +27,11 @@ The engine for this is OpenShift Pipelines. OpenShift Pipelines relies on Tekton
 
 This example will give you the choice of using code written in Go, Node.js, C#, or Python. A simple RESTful service, Quote Of The Day, will return quotes via an HTTP GET request.
 
-Here's an example of a cURL command against the service (this is PowerShell):
-![tkn resource ls results](images/curl-example.png)
+Here's an example of a cURL command against the service:  
+`curl http://qotd-pipelines-tutorial.apps.ci-ln-d5zj8tb-72292.origin-ci-int-gce.dev.rhcloud.com/quotes/random`
 
-Note: While the screen captures in this document are based on PowerShell, rest assured that everything here works equally well in a bash shell.
+`{"id":2,"quotation":"Life is really simple, but we insist on making it complicated.","author":"Confucius"}
+` 
 
 ## Prerequisites
 The following is a list of the environments and/or tools are necessary to perform this workshop. Details about each follow this list.
@@ -44,7 +45,7 @@ The following is a list of the environments and/or tools are necessary to perfor
 ### Prerequisite #1: A terminal session on your PC
 You'll need to be able to run commands at the command line on your PC. Note that this workshop works with Linux and macOS (bash or PowerShell) and Windows (PowerShell). Where any differences between bash and PowerShell occur in this workshop, commands for both environments will be supplied.
 
-*Yes, PowerShell runs on Linux and macOS.*
+*Yes and that was not a typo: PowerShell runs on Linux and macOS.*
 
 ### Prerequisite #2: OpenShift version 4.3 (or newer) cluster
 An OpenShift 4.3 (or newer) cluster is necessary to run this workshop. Options include:
@@ -61,7 +62,7 @@ An OpenShift 4.3 (or newer) cluster is necessary to run this workshop. Options i
 
 Visit the [OpenShift 4 web site at try.openshift.com](try.openshift.com) for instructions for your selected cloud-based infrastructure.
 
-Visit the [CodeReady Containers web site](https://developers.redhat.com/products/codeready-containers) for instructions regarding CodeReady Containers.
+Visit the [CodeReady Containers web site](https://developers.redhat.com/products/codeready-containers) for instructions regarding CodeReady Containers, which allows you to run a small OpenShift installation on your PC.
 
 ### Prerequisite #3: Tekton command line interface (CLI), `tkn`
 The Tekton CLI, `tkn`, is necessary. Note that this utility is built for your operating system of choice.
@@ -74,7 +75,7 @@ The OpenShift CLI, `oc`, is necessary. Note that this utility is built for your 
 To install oc, visit [the OpenShift version 4 clients download page](https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/) and download the client for your operating. You'll need to decompress the downloaded file and make sure the resulting executable bits are in your system PATH variable.
 
 ### Prerequisite #5: Git
-You'll need the Git tool installed on your machine. You can find the instructions at www.git-scm.com.
+You'll need the Git tool installed on your machine. You can find the instructions at [www.git-scm.com](https:www.git-scm.com).
 
 ### Prerequisite #6: Git repo at https://github.com/redhat-developer-demos/openshift-pipelines-tutorial.git  
 
@@ -93,16 +94,15 @@ It's worth noting here what you *do not* need to install. You do not need:
 * Node.js support
 * Make, MSBuild or any other build tools
 
-This is because all the build and deploy work is done in our OpenShift cluster. In fact, once the pipeline is built, you could do all your development work using [CodeReady Workspaces](https://developers.redhat.com/products/codeready-workspaces/overview) on, say, a Chromebook.
+This is because all the build and deploy work is done in our OpenShift cluster. In fact, once the pipeline is built, you could do all your development work using [CodeReady Workspaces](https://developers.redhat.com/products/codeready-workspaces/overview) on, say, a Chromebook or tablet (such as an iPad).
 
 
 ## Workshop
-The following list shows the seven steps that will be used to get our CI/CD pipeline up and running:
+The following list shows the six steps that will be used to get our CI/CD pipeline up and running:
 1. Create a project
 1. Install operator
-1. Create Pipeline
 1. Create Tasks
-1. Create Pipeline Resources
+1. Create Pipeline
 1. Run the Pipeline
 1. View the results
 
@@ -110,7 +110,7 @@ The following list shows the seven steps that will be used to get our CI/CD pipe
  <div style="background-color: cornsilk; margin-left: 20px; margin-right: 20px">
 <h4>Operators and Subscriptions Explained</h4>  
 
-Because OpenShift is built on Kubernetes, it supports the concept of "Operators", or pre-built Customer Resource Descriptions (CRD) that include the sometimes many pieces needed to invoke and sustain a solution. In other words, a Kubernetes Operator can be used to start and maintain a complex solution. For example, there is a Kubernetes Operator that allows you to very easily get an instance of MongoDB running in your OpenShift cluster. There are others: Eclipse Che, Elasticsearch, Kafka, and dozens more.  
+Because OpenShift is built on Kubernetes, it supports the concept of "Operators", or pre-built Customer Resource Descriptions (CRD) that include the (sometimes many) pieces needed to invoke and sustain a solution. In other words, a Kubernetes Operator can be used to start and maintain a complex solution. For example, there is a Kubernetes Operator that allows you to very easily get an instance of MongoDB running in your OpenShift cluster. There are others: Eclipse Che, Elasticsearch, Kafka, and scores more.  
 
 To invoke an operator *may* involve many steps. You install the Operator and the create a Subscription. In some cases, such as Kafka, you then invoke the API you want. For example, Kafka Connect or Kafka Topic.
   
@@ -127,9 +127,6 @@ Before any work can begin, you must be logged into your OpenShift cluster with c
 Create an OpenShift project in which we'll be working.  
 
 `oc new-project pipelines-tutorial`
-
-Example:
-![tkn resource ls results](images/oc-new-project.png)
 
 ### Workshop Step 2: Install operator
 When it comes to installing the OpenShift Pipelines Operator, you have two choices: Use the web UI dashboard or use the command line. For this workshop, we'll be using the cluster dashboard.
