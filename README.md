@@ -126,7 +126,9 @@ Before any work can begin, you must be logged into your OpenShift cluster with c
 ### Workshop Step 1: Create a project
 Create an OpenShift project in which we'll be working.  
 
-`oc new-project pipelines-tutorial`
+`oc new-project pipelines-tutorial`  
+`Now using project "pipelines-tutorial" on server "https://api.ci-ln-93bq48b-72292.origin-ci-int-gce.dev.rhcloud.com:6443".`  
+
 
 ### Workshop Step 2: Install operator
 When it comes to installing the OpenShift Pipelines Operator, you have two choices: Use the web UI dashboard or use the command line. For this workshop, we'll be using the cluster dashboard.
