@@ -1,6 +1,9 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
+  labels:
+    learn-pipelines: task
+    sandbox: learn-pipelines
   name: apply-manifests
 spec:
   workspaces:

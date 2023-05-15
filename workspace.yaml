@@ -2,6 +2,9 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: source-pvc
+  labels:
+    sandbox: learn-pipelines
+    learn-pipelines: workspace
 spec:
   accessModes:
     - ReadWriteOnce

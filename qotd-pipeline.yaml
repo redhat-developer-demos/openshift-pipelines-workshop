@@ -1,7 +1,10 @@
 apiVersion: tekton.dev/v1beta1 
 kind: Pipeline 
 metadata:
-  name: qotd-build-and-deploy 
+  name: qotd-build-and-deploy
+  labels:
+    sandbox: learn-pipelines
+    learn-pipelines: pipeline 
 spec: 
   workspaces: 
   - name: shared-workspace
