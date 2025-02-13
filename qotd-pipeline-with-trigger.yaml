@@ -17,7 +17,6 @@ spec:
     - name: clone-repo
       taskRef: 
         name: git-clone
-        kind: ClusterTask
       params:
         - name: url
           value: $(params.qotd-git)

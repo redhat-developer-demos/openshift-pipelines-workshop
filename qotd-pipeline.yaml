@@ -21,7 +21,6 @@ spec:
   - name: fetch-repository
     taskRef:
       name: git-clone
-      kind: ClusterTask
     workspaces:
     - name: output
       workspace: shared-workspace
@@ -35,7 +34,6 @@ spec:
   - name: build-image 
     taskRef:
       name: buildah
-      kind: ClusterTask
     params:
     - name: TLSVERIFY
       value: "false"
