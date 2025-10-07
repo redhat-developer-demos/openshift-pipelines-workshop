@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: qotd-build-and-deploy
+  name: qotd-clone
   labels:
     sandbox: learn-pipelines
     learn-pipelines: pipeline
@@ -38,23 +38,3 @@ spec:
       value: ""
     - name: deleteExisting
       value: "true"
-  - name: buildah
-    taskRef:
-      kind: Task
-      name: buildah-as-user
-    params:
-      - name: IMAGE
-        value: $(params.IMAGE)
-    workspaces:
-    - name: output
-      workspace: shared-workspace
-    runAfter:
-    - fetch-repository
-  - name: apply-manifests 
-    taskRef:
-      name: apply-manifests
-    workspaces:
-    - name: output
-      workspace: shared-workspace
-    runAfter: 
-    - buildah

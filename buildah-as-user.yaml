@@ -1,0 +1,101 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: buildah-as-user
+  annotations:
+    io.kubernetes.cri-o.userns-mode: 'auto:size=65536;map-to-root=true'
+    io.openshift.builder: 'true'
+spec:
+  description: >-
+    Buildah task builds source into a container image and
+    then pushes it to a container registry.
+    Buildah Task builds source into a container image using Project Atomic's
+    Buildah build tool.It uses Buildah's support for building from Dockerfiles,
+    using its buildah bud command.This command executes the directives in the
+    Dockerfile to assemble a container image, then pushes that image to a
+    container registry.
+  params:
+  - name: IMAGE
+    description: Reference of the image buildah will produce.
+  - name: BUILDER_IMAGE
+    description: The location of the buildah builder image.
+    default: registry.redhat.io/rhel8/buildah@sha256:99cae35f40c7ec050fed3765b2b27e0b8bbea2aa2da7c16408e2ca13c60ff8ee
+  - name: STORAGE_DRIVER
+    description: Set buildah storage driver
+    default: vfs
+  - name: DOCKERFILE
+    description: Path to the Dockerfile to build.
+    default: ./Dockerfile
+  - name: CONTEXT
+    description: Path to the directory to use as context.
+    default: .
+  - name: TLSVERIFY
+    description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
+    default: "true"
+  - name: FORMAT
+    description: The format of the built container, oci or docker
+    default: "oci"
+  - name: BUILD_EXTRA_ARGS
+    description: Extra parameters passed for the build command when building images.
+    default: ""
+  - description: Extra parameters passed for the push command when pushing images.
+    name: PUSH_EXTRA_ARGS
+    type: string
+    default: ""
+  - description: Skip pushing the built image
+    name: SKIP_PUSH
+    type: string
+    default: "false"
+  results:
+  - description: Digest of the image just built.
+    name: IMAGE_DIGEST
+    type: string
+  workspaces:
+  - name: output
+  steps:
+  - name: build
+    securityContext:
+      runAsUser: 1000 
+      runAsNonRoot: true
+      capabilities:
+        add: 
+          - SETFCAP
+    image: $(params.BUILDER_IMAGE)
+    workingDir: $(workspaces.output.path)
+    script: |
+      echo "Running as USER ID `id`" 
+      buildah --storage-driver=$(params.STORAGE_DRIVER) bud \
+        $(params.BUILD_EXTRA_ARGS) --format=$(params.FORMAT) \
+        --tls-verify=$(params.TLSVERIFY) --no-cache \
+        -f $(params.DOCKERFILE) -t $(params.IMAGE) $(params.CONTEXT)
+      [[ "$(params.SKIP_PUSH)" == "true" ]] && echo "Push skipped" && exit 0
+      buildah --storage-driver=$(params.STORAGE_DRIVER) push \
+        $(params.PUSH_EXTRA_ARGS) --tls-verify=$(params.TLSVERIFY) \
+        --digestfile $(workspaces.output.path)/image-digest | tee /tekton/results/IMAGE_DIGEST
+    volumeMounts:
+    - name: varlibcontainers
+      mountPath: /home/build/.local/share/containers 
+  stepTemplate:
+    env:
+      - name: HOME
+        value: /tekton/home
+    image: $(params.builder-image)
+    imagePullPolicy: IfNotPresent
+    name: ''
+    resources:
+      limits:
+        cpu: '1'
+        memory: 4Gi
+      requests:
+        cpu: 100m
+        memory: 2Gi
+    securityContext:
+      capabilities:
+        add:
+          - SETFCAP
+      runAsNonRoot: true
+      runAsUser: 1000 
+    workingDir: $(workspaces.working-directory.path)
+  volumes:
+  - name: varlibcontainers
+    emptyDir: {}
